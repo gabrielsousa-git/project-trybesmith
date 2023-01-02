@@ -1,5 +1,6 @@
 import { Pool, ResultSetHeader } from 'mysql2/promise';
 import User from '../interfaces/user.interface';
+import Login from '../interfaces/login.interface';
 
 export default class UserModel {
   public connection: Pool;
@@ -17,5 +18,14 @@ export default class UserModel {
     const [dataInserted] = result;
     const { insertId } = dataInserted;
     return { id: insertId, ...user };
+  }
+
+  public async findOne(username: Login['username'], password: Login['password']): Promise<User[]> {
+    const result = await this.connection.execute(
+      'SELECT * FROM Trybesmith.users WHERE username LIKE ? AND password LIKE ?',
+      [username, password],
+    );
+    const [rows] = result;
+    return rows as User[];
   }
 }
